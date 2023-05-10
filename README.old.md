@@ -1,2 +1,0 @@
-# portfolio
-blog for portfolio
