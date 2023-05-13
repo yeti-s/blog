@@ -1,14 +1,14 @@
 {
-  "name": "portfolio",
+  "name": "blog",
   "version": "1.0.0",
   "private": true,
-  "description": "portfolio",
+  "description": "yeti's blog",
   "author": "yeti_s",
   "keywords": [
     "gatsby"
   ],
   "scripts": {
-    "deploy": "gatsby build && gh-pages -d public",
+    "deploy": "gatsby build --prefix-paths && gh-pages -d public",
     "develop": "gatsby develop",
     "start": "gatsby develop",
     "build": "gatsby build",
@@ -26,7 +26,6 @@
     "gatsby-plugin-sharp": "^5.9.0",
     "gatsby-source-filesystem": "^5.9.0",
     "gatsby-transformer-sharp": "^5.9.0",
-    "gh-pages": "^5.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -34,6 +33,7 @@
     "@types/node": "^18.16.5",
     "@types/react": "^18.2.5",
     "@types/react-dom": "^18.2.4",
+    "gh-pages": "^5.0.0",
     "typescript": "^5.0.4"
   }
 }
