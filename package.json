@@ -1,5 +1,6 @@
 {
   "name": "blog",
+  "homepage": "https://yeti-s.github.io/blog/",
   "version": "1.0.0",
   "private": true,
   "description": "yeti's blog",
@@ -12,7 +13,7 @@
     "develop": "gatsby develop",
     "start": "gatsby develop",
     "build": "gatsby build",
-    "serve": "gatsby serve",
+    "serve": "gatsby serve --prefix-paths",
     "clean": "gatsby clean",
     "typecheck": "tsc --noEmit"
   },
