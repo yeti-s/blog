@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkblog=self.webpackChunkblog||[]).push([[691],{7200:function(e,t,l){l.r(t);var n=l(7294),a=l(1883);t.default=()=>n.createElement("div",null,n.createElement("h1",null,"Welcome to my Gatsby site!"),n.createElement("p",null,"This is the home page."),n.createElement("p",null,"version: 0.2.0"),n.createElement("p",null,"Go to the ",n.createElement(a.Link,{to:"intro"},"Blog")))}}]);
+//# sourceMappingURL=component---src-pages-index-tsx-42ca846191eafd1982b5.js.map
