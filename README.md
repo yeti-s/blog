@@ -1,49 +1,31 @@
-<p align="center">
-  <a href="https://www.gatsbyjs.com/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts">
-    <img alt="Gatsby" src="https://www.gatsbyjs.com/Gatsby-Monogram.svg" width="60" />
-  </a>
-</p>
-<h1 align="center">
-  Gatsby Minimal TypeScript Starter
-</h1>
+# [Blog](https://github.com/yeti-s/blog)
+blog to keep a record of goals, progress, and to preserve legacy while working on multiple projects.
 
-## 🚀 Quick start
+ 
+* **dynamic pages:** create pages automatically from contents written by markdown.
+* **customizable:** Virtual dom element should be editable cause of plan to add features such as point cloud viewer with three.js. So use template little.
 
-1.  **Create a Gatsby site.**
+# Installation
+Environment to run this project.
+* node v18
 
-    Use the Gatsby CLI to create a new site, specifying the minimal TypeScript starter.
-
-    ```shell
-    # create a new Gatsby site using the minimal TypeScript starter
-    npm init gatsby -- -ts
+# Getting Started
+1. clone source code & install dependency
     ```
-
-2.  **Start developing.**
-
-    Navigate into your new site’s directory and start it up.
-
-    ```shell
-    cd my-gatsby-site/
-    npm run develop
+    git clone https://github.com/yeti-s/blog
+    cd blog
+    npm install
     ```
-
-3.  **Open the code and start customizing!**
-
-    Your site is now running at http://localhost:8000!
-
-    Edit `src/pages/index.tsx` to see your site update in real-time!
-
-4.  **Learn more**
-
-    - [Documentation](https://www.gatsbyjs.com/docs/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts)
-    - [Tutorials](https://www.gatsbyjs.com/docs/tutorial/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts)
-    - [Guides](https://www.gatsbyjs.com/docs/how-to/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts)
-    - [API Reference](https://www.gatsbyjs.com/docs/api-reference/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts)
-    - [Plugin Library](https://www.gatsbyjs.com/plugins?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts)
-    - [Cheat Sheet](https://www.gatsbyjs.com/docs/cheat-sheet/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts)
-
-## 🚀 Quick start (Netlify)
-
-Deploy this starter with one click on [Netlify](https://app.netlify.com/signup):
-
-[<img src="https://www.netlify.com/img/deploy/button.svg" alt="Deploy to Netlify" />](https://app.netlify.com/start/deploy?repository=https://github.com/gatsbyjs/gatsby-starter-minimal-ts)
+2. start development
+   ```
+   npm start
+   ```
+3. deploy on local
+    ```
+    npm run build
+    npm run serve
+    ```
+4. deploy on gh-page
+   ```
+   npm run deploy
+   ```
