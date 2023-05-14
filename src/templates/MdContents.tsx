@@ -1,6 +1,6 @@
 import * as React from "react"
 import type { HeadFC, PageProps } from "gatsby"
-import { graphql } from 'gatsby'
+import { graphql, Link } from 'gatsby'
 
 import '../styles.css';
 
@@ -36,7 +36,6 @@ type QueryProps = {
 };
 
 const IndexPage = ({ data }: PageProps<QueryProps>) => {
-    console.log(data)
     const node = data.markdownRemark
 
     // create sidebar components
@@ -60,7 +59,11 @@ const IndexPage = ({ data }: PageProps<QueryProps>) => {
         dirs.forEach((files, key, obj) => {
             let children = Array<React.ReactElement>();
             files.forEach((file, index, arr) => {
-                children.push(<SidebarItem title={file.title} href={file.path} key={file.id}/>)
+                children.push(
+                    <SidebarItem key={file.id}>
+                        <Link to={file.path}>{file.title}</Link>
+                    </SidebarItem>
+                )
             })
             if (key === '') components = children.concat(components)
             else components.push(<SidebarItemMenu id={key} title={key} children={children} key={key}/>)
