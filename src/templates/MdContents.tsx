@@ -1,6 +1,7 @@
 import * as React from "react"
 import type { HeadFC, PageProps } from "gatsby"
 import { graphql, Link } from 'gatsby'
+import { Provider } from "react-redux";
 
 import '../styles.css';
 
@@ -9,6 +10,7 @@ import SidebarItemContainer from "../sidebar/SidebarItemContainer";
 import SidebarItemMenu from "../sidebar/SidebarItemMenu";
 import SidebarItem from "../sidebar/SidebarItem";
 import ContentsView from "../sidebar/ContemtView";
+import store from "../redux/store";
 
 type QueryProps = {
     markdownRemark: {
@@ -73,14 +75,16 @@ const IndexPage = ({ data }: PageProps<QueryProps>) => {
 
     return (
         <main>
-            <div className="wrapper d-flex align-items-stretch">
-                <SidebarContainer>
-                    <SidebarItemContainer name="yeti's blog">
-                        {createSidebarItems()}
-                    </SidebarItemContainer>
-                </SidebarContainer>
-                <ContentsView html={node.html} title={node.frontmatter.title} date={node.frontmatter.date} categories={node.frontmatter.categories} />
-            </div>
+            <Provider store={store}>
+                <div className="wrapper d-flex align-items-stretch">
+                    <SidebarContainer>
+                        <SidebarItemContainer name="yeti's blog">
+                            {createSidebarItems()}
+                        </SidebarItemContainer>
+                    </SidebarContainer>
+                    <ContentsView html={node.html} title={node.frontmatter.title} date={node.frontmatter.date} categories={node.frontmatter.categories} />
+                </div>
+            </Provider>
         </main>
     )
 }

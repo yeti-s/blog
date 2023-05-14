@@ -1,4 +1,6 @@
-import React, { useState } from 'react'
+import React, { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { open, close } from '../redux/duxes/siderbar'
 
 type Props = {
     id: string,
@@ -7,15 +9,27 @@ type Props = {
 }
 
 export default function SidebarItemMenu({ id, title, children }: Props): React.ReactElement {
-    const [collapsed, setCollapsed] = useState(true)
+    const dispatch = useDispatch()
+    const collapsed = useSelector((state:any) => {
+        if (state.sidebar[title]) return state.sidebar[title]
+        return false
+    })
 
-    const collapse = () => {
-        setCollapsed(!collapsed)
+    useEffect(()=>{
+        console.log("collapsed", collapsed)
+    },[collapsed])
+
+    const openMenu = () => {
+        dispatch(open(title))
+    }
+
+    const closeMenu = () => {
+        dispatch(close(title))
     }
 
     return (
         <li className="active">
-            <a data-toggle="collapse" aria-expanded={!collapsed} onClick={collapse}
+            <a data-toggle="collapse" aria-expanded={!collapsed} onClick={collapsed ? openMenu : closeMenu}
                 className={collapsed ? "dropdown-toggle" : "dropdown-toggle collapsed"}>{title}</a>
             <ul className={collapsed ? "collapse list-unstyled" : "collapse list-unstyled show"} id={id}>
                 {children}
