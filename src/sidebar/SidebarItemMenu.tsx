@@ -15,10 +15,6 @@ export default function SidebarItemMenu({ id, title, children }: Props): React.R
         return false
     })
 
-    useEffect(()=>{
-        console.log("collapsed", collapsed)
-    },[collapsed])
-
     const openMenu = () => {
         dispatch(open(title))
     }
