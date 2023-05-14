@@ -1,7 +1,7 @@
 import type { GatsbyConfig } from "gatsby";
 
 const config: GatsbyConfig = {
-  pathPrefix: "/",
+  pathPrefix: "/blog",
   siteMetadata: {
     title: `blog`,
     siteUrl: `https://yeti-s.github.io/blog`
