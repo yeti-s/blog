@@ -6,6 +6,7 @@ const IndexPage: React.FC = () => {
     <div>
       <h1>Welcome to my Gatsby site!</h1>
       <p>This is the home page.</p>
+      <p>version: 0.2.0</p>
       <p>Go to the <Link to="intro">Blog</Link></p>
     </div>
   );
