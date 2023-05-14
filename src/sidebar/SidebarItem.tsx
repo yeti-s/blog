@@ -1,16 +1,16 @@
 import React, { useState } from 'react'
 
 type Props = {
-    name: string
+    title: string
     href: string
 }
 
-export default function SidebarItem({name, href}: Props): React.ReactElement {
+export default function SidebarItem({title, href}: Props): React.ReactElement {
 
 
     return (
         <li>
-            <a href={href}>{name}</a>
+            <a href={href}>{title}</a>
         </li>
     )
 }

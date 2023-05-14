@@ -2,11 +2,11 @@ import React, { useState } from 'react'
 
 type Props = {
     id: string,
-    name: string,
+    title: string,
     children: Array<JSX.Element>
 }
 
-export default function SidebarItemMenu({ id, name, children }: Props): React.ReactElement {
+export default function SidebarItemMenu({ id, title, children }: Props): React.ReactElement {
     const [collapsed, setCollapsed] = useState(true)
 
     const collapse = () => {
@@ -15,8 +15,8 @@ export default function SidebarItemMenu({ id, name, children }: Props): React.Re
 
     return (
         <li className="active">
-            <a href={"#"+id} data-toggle="collapse" aria-expanded={!collapsed} onClick={collapse}
-                className={collapsed ? "dropdown-toggle" : "dropdown-toggle collapsed"}>{name}</a>
+            <a data-toggle="collapse" aria-expanded={!collapsed} onClick={collapse}
+                className={collapsed ? "dropdown-toggle" : "dropdown-toggle collapsed"}>{title}</a>
             <ul className={collapsed ? "collapse list-unstyled" : "collapse list-unstyled show"} id={id}>
                 {children}
             </ul>

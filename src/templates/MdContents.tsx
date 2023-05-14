@@ -18,7 +18,7 @@ type QueryProps = {
             date: string,
             categories: Array<string>,
             summary: string,
-            thumbnail: string,
+            // thumbnail: string,
             path: string
         }
     },
@@ -33,14 +33,6 @@ type QueryProps = {
             }
         }[]
     }
-    allFile: {
-        nodes: {
-            id: string,
-            name: string,
-            changeTime: string,
-            relativeDirectory: string
-        }[]
-    }
 };
 
 const IndexPage = ({ data }: PageProps<QueryProps>) => {
@@ -52,12 +44,13 @@ const IndexPage = ({ data }: PageProps<QueryProps>) => {
         let components = Array<React.ReactElement>();
         let dirs = new Map<string, any[]>();
         // create 
-        data.allFile.nodes.map(node => {
+        data.allMarkdownRemark.nodes.map(node => {
             let file = {
-                name: node.name,
-                changeTime: node.changeTime,
-                dir: node.relativeDirectory,
-                id: node.id
+                id: node.id,
+                title: node.frontmatter.title,
+                changeTime: node.frontmatter.date,
+                dir: node.frontmatter.menu,
+                path: node.frontmatter.path
             }
             if (!dirs.hasOwnProperty(file.dir))
                 dirs.set(file.dir, [])
@@ -67,10 +60,10 @@ const IndexPage = ({ data }: PageProps<QueryProps>) => {
         dirs.forEach((files, key, obj) => {
             let children = Array<React.ReactElement>();
             files.forEach((file, index, arr) => {
-                children.push(<SidebarItem name={file.name} href={`${file.id}`} key={file.id}/>)
+                children.push(<SidebarItem title={file.title} href={file.path} key={file.id}/>)
             })
-            if (key === '') components = components.concat(children)
-            else components.push(<SidebarItemMenu id={key} name={key} children={children} key={key}/>)
+            if (key === '') components = children.concat(components)
+            else components.push(<SidebarItemMenu id={key} title={key} children={children} key={key}/>)
         })
         return components;
     }
@@ -83,7 +76,7 @@ const IndexPage = ({ data }: PageProps<QueryProps>) => {
                         {createSidebarItems()}
                     </SidebarItemContainer>
                 </SidebarContainer>
-                <ContentsView html={node.html} />
+                <ContentsView html={node.html} title={node.frontmatter.title} date={node.frontmatter.date} categories={node.frontmatter.categories} />
             </div>
         </main>
     )
@@ -100,14 +93,20 @@ query($id: String!) {
             html
             frontmatter {
                 title
+                date
+                categories
+                summary
             }
     }
-    allFile {
+    allMarkdownRemark {
         nodes {
             id
-            name
-            changeTime
-            relativeDirectory
+            frontmatter {
+                title
+                date
+                menu
+                path
+            }
         }
     }
 }
