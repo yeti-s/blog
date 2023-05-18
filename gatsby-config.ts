@@ -27,7 +27,6 @@ const config: GatsbyConfig = {
       options: {
         "name": "contents",
         "path": "./contents/",
-        "ignore": ["**/*.PNG", "**/*.png", "**/*.JPG", "**/*.jpg"]
       },
       __key: "contents"
     }, {

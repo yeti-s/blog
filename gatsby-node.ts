@@ -11,9 +11,6 @@ const createPages: GatsbyNode["createPages"] = async ({graphql, actions}) => {
                 node {
                     id
                     fileAbsolutePath
-                    frontmatter {
-                        path
-                    }
                 }
             }
         }
