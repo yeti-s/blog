@@ -103,6 +103,13 @@ const IndexPage = ({ data }: PageProps<QueryProps>) => {
             }
             nodes.get(file.menu)?.push(file);
         })
+        // sort menu items
+        nodes.forEach((files, key, obj) => {
+            files.sort((item1, item2):number => {
+                if (item1['filename'] > item2['filename']) return 1;
+                return -1;
+            })
+        })
         // create components
         nodes.forEach((files, key, obj) => {
             console.log(files)
@@ -149,7 +156,6 @@ query($id: String!) {
             fileAbsolutePath
             frontmatter {
                 title
-                date
                 categories
                 summary
             }
@@ -160,9 +166,6 @@ query($id: String!) {
             fileAbsolutePath
             frontmatter {
                 title
-                date
-                menu
-                path
             }
         }
     }
