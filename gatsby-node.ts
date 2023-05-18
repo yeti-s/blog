@@ -10,18 +10,35 @@ const createPages: GatsbyNode["createPages"] = async ({graphql, actions}) => {
             edges {
                 node {
                     id
+                    fileAbsolutePath
                     frontmatter {
                         path
                     }
                 }
             }
         }
+        allFile {
+            edges{
+                node {
+                    absolutePath
+                    name
+                    relativeDirectory
+                }
+            }
+        }
     }
     `);
+    
+    const nodes:any = {};
+    result.data.allFile.edges.forEach(({node}:any) => {
+        nodes[node.absolutePath] = `${node.relativeDirectory}/${node.name}`;
+    })
+
 
     result.data.allMarkdownRemark.edges.forEach(({node}: any) => {
+        const path:string = nodes[node.fileAbsolutePath];
         createPage({
-            path: node.frontmatter.path,
+            path: path,
             component: resolve('./src/templates/MdContents.tsx'),
             context:{
                 id: node.id
