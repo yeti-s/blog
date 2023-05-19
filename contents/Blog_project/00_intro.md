@@ -1,11 +1,8 @@
 ---
-title: '프로젝트 소개'
-date: '2023-05-14'
+title: 'Blog 프로젝트 소개'
 categories: ['blog', 'intro']
 summary: '학습 진도 설정 및 확인, 기술 스택 메모등을 위한 블로그를 생성하는 프로젝트이다.'
 thumbnail: '../assets/icon.png'
-menu: 'blog'
-path: '/yeti_blog/intro'
 ---
 # [Blog](https://github.com/yeti-s/blog)
 blog to keep a record of goals, progress, and to preserve legacy while working on multiple projects.

@@ -1,11 +1,8 @@
 ---
 title: 'Framework Gatsby'
-date: '2023-05-15'
 categories: ['blog', 'gatsby', 'dev']
 summary: 'Blog 1일차 개발 일지.'
 thumbnail: '../assets/icon.png'
-menu: 'blog'
-path: '/yeti_blog/01_dev_diary'
 ---
 ## **프레임워크 선정**
 
@@ -173,3 +170,62 @@ Gatsby는 src/pages에 tsx파일을 page로 생성한다고 하였다. 그럼 .m
     export {createPages}
     ```
 위 방법으로 contents 폴더에 있는 .md 파일을 읽고 페이지로 생성한다.
+
+## Markdown, File system
+
+markdown query로 sidebar를 생성할 경우 아래와 같이 많은 metadata가 필요하다. 데이터를 생성하고 수정할 때 마다 변경해 주는 것이 비효율적인 것 같아 file system과 연동할 수 있는 부분은 제거하려고 한다.
+
+```
+---
+title: '프로젝트 소개'
+date: '2023-05-14'
+categories: ['blog', 'intro']
+summary: '학습 진도 설정 및 확인, 기술 스택 메모등을 위한 블로그를 생성하는 프로젝트이다.'
+thumbnail: '../assets/icon.png'
+menu: 'blog'
+path: '/yeti_blog/intro'
+---
+```
+
+date, menu, path 등은 각각 file의 생성 날짜, 상위 dir 이름, 상대 경로로 대체할 수 있다. 
+
+```typescript
+`
+allMarkdownRemark {
+    nodes {
+        id
+        fileAbsolutePath
+        frontmatter {
+            title
+        }
+    }
+}
+allFile {
+    nodes {
+        name
+        birthTime(formatString: "YYYY-MM-DD hh:mm:ss")
+        ctime(formatString: "YYYY-MM-DD hh:mm:ss")
+        relativeDirectory
+        absolutePath
+    }
+}
+`
+```
+
+위와 같이 커ㅜ리를 추가하고 allFile과 allMarkdownRemark의 필요한 정보를 모아 sidebar를 구성한다. 
+
+테스트를 하다 보니 sidebar item들의 순서가 섞이는 현상이 있었다. 이를 위해 규칙을 정하고 sort해서 render하기로 하였다. 목록의 표시하고 싶은 순서대로 contents의 파일명을 00_filename.md, 01_filename.md 등으로 두고 filename을 토대로 menu 내에서 sort 하기로 하였다.
+
+```typescript
+// sort menu items
+nodes.forEach((files, key, obj) => {
+    files.sort((item1, item2):number => {
+        if (item1['filename'] > item2['filename']) return 1;
+        return -1;
+    })
+})
+```
+
+![정렬된 Sidebar](./assets/01_sorted_sidebar.PNG "정렬된 Sidebar")
+
+잘 된 것 같다.
