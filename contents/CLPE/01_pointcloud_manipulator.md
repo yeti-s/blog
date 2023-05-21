@@ -1,14 +1,14 @@
 ---
-title: 'MPC'
-categories: ['clpe', 'mpc']
+title: 'Pointcloud Manipulator'
+categories: ['clpe', 'pointcloud_manipulator']
 summary: 'Point cloud 데어터를 조정할 수 있는 C 프로그램'
 thumbnail: '../assets/icon.png'
 ---
-Maipulate point cloud로 point cloud 데이터를 사용자의 요청대로 조작할 수 있는 lib 형태의 프로그램을 제작한다.
+Pointcloud 데이터를 사용자의 요청대로 조작할 수 있는 lib 형태의 프로그램을 제작한다.
 
 ## 배경 지식
 ### Potree
-point cloud octree로 point cloud 데이터를 octree의 형태로 쪼개어 render 하는 형식.
+> point cloud octree로 point cloud 데이터를 octree의 형태로 쪼개어 render 하는 형식.
 ![octree](./assets/01_octree.png "출처 - https://developer.apple.com/documentation/gameplaykit/gkoctree")
 
 ## 학습 데이터 구축
@@ -27,13 +27,11 @@ point cloud octree로 point cloud 데이터를 octree의 형태로 쪼개어 ren
 
 ## 1. Electron & React 
 
-로컬 환경에서 어플리케이션으로 구동 가능하도록 Electron에 react를 올려 사용할 것이다. 또 three.js 나 potree-core 등 point cloud loading에 필요한 패키지도 함께 설정하자.
+> 로컬 환경에서 어플리케이션으로 구동 가능하도록 Electron에 react를 올려 사용할 것이다. 또 three.js 나 potree-core 등 point cloud loading에 필요한 패키지도 함께 설정하자.
 
-C++ 개발과 동시에 진행하기 떄문에 wsl 환경에서 진행 할 것인데, GUI 문제가 있으므로 X-server등을 잘 활용해서 환경을 만들어 두자!. 나는 VcXsrv 사용했다.
-
+> C++ 개발과 동시에 진행하기 떄문에 wsl 환경에서 진행 할 것인데, GUI 문제가 있으므로 X-server등을 잘 활용해서 환경을 만들어 두자!. 나는 VcXsrv 사용했다.
 ![electron on VcXsrv](./assets/01_electron_on_vcxsrv.PNG "electron on VcXsrv")
 
-굳!
 
 
 기본 index 페이지에서 부터 point cloud 화면을 띄울 수 있도록 3D canvas로 만들자. point cloud 데이터를 file system에서 가져오기 위해서는 electron 과 renderer의 ipc(inter-process communication)가 필요하다.
@@ -82,9 +80,32 @@ window.fetch = fetchFile;
 
 ![slow_loading](./assets/01_slowly_loading_potree.gif "slow_loading")
 
-너무 느리다. ipc 통신이 http통신보다 더 느린가보다. 일단 바쁘니 나중에 비교하자. expressjs로 file을 serve하는 간단한 기능을 가진 서버를 구축해서 electron을 제거하고 다시 시작해보자. 창 여러개 띄우고 실행할 수 있으니 이게 더 좋은 방법일수도 있겠다.
+너무 느리다. ipc 통신이 http통신보다 더 느린가보다. 일단 바쁘니 나중에 비교하자. expressjs로 file을 serve하는 간단한 기능을 가진 서버를 구축해서 electron을 제거하고 다시 시작해보자. 창 여러개 띄우고 실행할 수 있으니 이게 더 좋은 방법일수도 있겠다. 개발 환경에서도 로딩이 느린 문제가 있었는데 빌드 하고 배포한 환경에서 시작을 해보니 잘 작동한다.
 
+해당 프로그램의 목적은 아래와 같다.
+* ### (x, y, z) 범위 내부의 pointcloud 데이터만 가시화하기 
+학습 모델의 train 데이터의 범위를 줄이고, local 단위 학습을 먼저 진행하기 위해서 pointcloud 데이터를 원하는 범위만큼 잘라내는 기술이 필요하다. 해당 요청을 위해 지정한 범위 내부의 pointcloud만 보이는 기술을 구현해야 한다. PotreeDesktop 에서 이미 아래 사진과 같은 Clipping Volume 이라고 지원하고 있다. 이를 조금 가공하여 써먹기 쉽도록 구현해보자. volume은 4x4 행렬의 형태로 [Transform matrix](https://en.wikipedia.org/wiki/Transformation_matrix) 형태라고 한다. 행렬을 통해 shader에서 연산을 통해 내부에 있는지 없는지 계산하는 것 같다.
 
+![clipping_inside](./assets/01_clipping_exam.PNG "clipping_inside")
+
+* ### intensity 한계점 이상의 pointcloud 데이터만 가시화하기
+학습 모델의 target을 획득하기 위해 intensity의 threshold가 필요하다. threshold 이상의 intensity를 가진 pointcloud 데이터를 가시화할 수 있는 기능을 구현하여 학습의 target이 될 intensity의 threshold 값과, 해당하는 pointcloud의 범위를 찾아낼 수 있다. 위 volume을 통한 clipping 코드에서 intensity attribute에 대하여 추가해주자. viewer, octree, material 등에 intensity filter 값을 추가하고 shader에 아래 내용을 추가하자.
+```C
+#if defined(clip_intensity_enabled)
+{ // intensity filter
+    float threshold = uFilterIntensity;
+    
+    if (intensity < threshold) {
+        gl_Position = vec4(100.0, 100.0, 100.0, 0.0);
+        return;
+    }
+}
+#endif
+```
+그리고 potree renderer에 해당 shader가 사용될 수 있도록 코드를 추가해주면 완성이다. 이 부분은 shader와 여러 소스 코드들을 직접 수정해야할 필요가 있으므로 [potree](https://github.com/potree/potree)에서 소스를 받아와서 수정하고 빌드한 후 react에 붙이는 방식으로 사용하자
+![clipping_intensity](./assets/01_clipping_intensity.PNG "clioping_intensity")
+
+![cliiping](./assets/01_clipping_volume_intensity.PNG "clipping")
 
 
 1. find lidar open dataset.
