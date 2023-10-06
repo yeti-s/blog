@@ -27,15 +27,10 @@ Pointcloud 데이터를 사용자의 요청대로 조작할 수 있는 lib 형�
 
 ## 1. find lidar open dataset.
 
-* [KITTI](https://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=3d)
-> 
-> 용량이 29GB나 되니 여유 있을때 다운로드 받자.
-> 
-> 도로를 대상으로 촬영한 데이터가 아닌 것 같다.
-> 
-> ![KITTI_potree](./assets/01_KITTI_potree.PNG)
->
-> 사실 애는 이거 말고도 데이터가 많은 것 같은데 나중에 살펴보자.
+* [KITTI](https://www.cvlibs.net/datasets/kitti/raw_data.php)
+
+> raw data를 제공하여 가공하여 쓸 줄 알면 많은 범위에서 이용 가능할 듯 하다. 또한 데이터 자체도 여러 지역에서 촬영하여 많이 사용할 수 있을 것 같다.
+
 
 * [Toronto_3D](https://github.com/WeikaiTan/Toronto-3D)
 
@@ -45,6 +40,8 @@ Pointcloud 데이터를 사용자의 요청대로 조작할 수 있는 lib 형�
 ![toronto_3d_laslib](./assets/01_toronto_3d_no_intensity.PNG)
 
 * [Paris-Lille-3D](https://npm3d.fr/paris-lille-3d)
+
+> 촬영 경로가 짧고 도로 위 주차된 차량과 같은 장애물이 많다. 또한 road marking이 많이 존재하지 않아 간단한 테스트 용도 외로는 안쓸듯 하다.
 
 ## 2. Electron & React 
 
@@ -204,3 +201,42 @@ while(reader.ReadNextPoint()) {
 ```
 
 > thread pool과 batch 사용하는 형태로 추가헀다. thread 10으로 설정하고 테스트 해 보았는데 확실하게 작업 성능이 향상되었다. 개꿀
+
+> 다시 생각을 해보니 clip box 의 matrix 처럼 원점이 0이고 부피가 1인 정육면체를 road marking의 bounding box의 형태로 만드는 4x4 matrix 하나만 있으면 train의 데이터로 충분할 것 같다. label을 4x4의 matrix 형태로 생산하여 테스트를 하는 것으로 코드를 바꿔보자.
+
+## Front 추가 개발
+
+### json
+
+### 예전 작업 상황 복원
+> clipping volume은 TransformationTool에서 해당 volume을 클릭하면 나오는 UI(scale, rotation, translation 조절 가능한 점, 원, 선 등등)을 변경 시 event listener가 구현되어 있다. 여기에 추가로 drag & drop 이벤트 발생 시 event listener를 추가할 수 있도록 변경해보자.
+
+```javascript
+constructor()
+{
+    ... // 일단 생성자에 추가적으로 호출할 handler 배열을 선언해주고
+    this.additionalDropScaleHandle = [];
+    this.additionalDragScaleHandle = [];
+    this.additionalDropRotationHandle = [];
+    this.additionalDragRotationHandle = [];
+    this.additionalDropTranslationHandle = [];
+    this.additionalDragTranslationHandle = [];
+}
+
+initializeScaleHandles() {
+    ... //각 initialize 부분에 방금 추가한 handler 배열을 각 이벤트 시 보고 발생시키는 쪽으로 만들어줬다.
+    pickSphere.addEventListener("drag", (e) => {
+        this.additionalDragScaleHandle.forEach(handle => {
+            handle(e)
+        });
+    })
+    pickSphere.addEventListener("drop", (e) => {
+        this.additionalDropScaleHandle.forEach(handle => {
+            handle(e)
+        });
+    })
+}
+```
+>이 기능은 작업 시 잘못 눌렀을 때 ctrl+z 로 복구하는 기능으로 사용할 수 있을듯
+
+>추가로 volume의 scale, rotation, position을 변경하고 volume.dispatchEvent로 이벤트 발생을 알리면 알아서 update하여 volume에 반영이 된다. 이를 활용해서 예전에 만들어 둔 json 불러오기로 작업 상태를 다시 복구할 수 있을 듯 하다.
