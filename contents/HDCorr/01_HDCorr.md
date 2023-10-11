@@ -18,6 +18,14 @@ MMS(Mobile Mapping System) 장비를 이용하여 수집한 데이터를 센서 
 동일한 공간을 서로 다른 시간에 촬영한 데이터를 보면 IMU 센서에 의한 오차로 인해 point들이 어느정도 차이가 나는 것을 볼 수 있다. 전체 HD Map을 제작하기 위해 이를 Translation과 Interpolation을 통해 데이터를 보정한다.
 
 ## 파이프라인
+* Feature Detection And Matching
+    1. Point Cloud의 Bird's Eye View
+    2. Feature Detecting
+    3. Feature Matching
+    4. Metric Learning
+* 
+    1. Point cloud 샘플링
+    2. 
 * Point cloud 샘플링
     * Road Marking Segmentation (Camera Image)
 * 동일 도로 노면 감지
@@ -41,7 +49,7 @@ Apolloscape는 Lane Segmentation, Scene Parsing, Detection/Tracking 등 다양�
 IMU 정보를 가진 Ego Vehicle 데이터를 이용하여 GeoJSON 형식으로 촬영된 지리 공간을 웹에서 Openlayers API를 활용해 표시할 수 있도록 한다. Ego Vehicle의 Translation 값은 각 도시의 Original 좌표 기준 미터 단위의 Offset을 나타낸다.
 
 
-## 센서 캘리브레이션
+## 데이터 구조
 AV2 데이터셋은 아래 6개의 도시에서 수집되었다.
 * Austin, Texas: 31 logs.
 * Detroit, Michigan: 117 logs.
@@ -67,11 +75,11 @@ AV2의 Sensor 데이터는 아래와 같은 폴더 구조를 가진다
     |   |-- sensors
     |       |-- cameras
     |           |-- ring_front_center
-    |               |-- 315969823049927210.jpg
+    |               |-- [time_stamp].jpg
     |               |-- ...
     |           |-- ...
     |       |-- lidar
-    |           |-- 315969823059705000.feather
+    |           |-- [time_stamp].feather
     |           |-- ...
     |   |-- potree (캘리브레이션을 통해 생성할 데이터)
     |       |-- [data id].las
@@ -86,13 +94,40 @@ AV2의 Sensor 데이터는 아래와 같은 폴더 구조를 가진다
 
 캘리브레이션 하여 생성한 Point Cloud 데이터를 .las 형식의 파일로 저장하고 [Potree](https://github.com/potree/potree)를 이용하여 이를 시각화 할 것이다.
 
+## 센서 캘리브레이션
 
 ### 라이다 캘리브레이션
-AV2 데이터셋은 두 개의 32 Channel Lidar를 이용하여 하나의 64 Channel Lidar처럼 사용하였다.
-<br> Up Lidar와 Down Lidar에 대한 Sensor Calibration을 제공하지만 Point Cloud는 이미 두 Lidar를 융합하여 Ego Vehicle의 좌표계로 변환해 둔 데이터를 제공하기에 쓸 일이 없다.
+AV2 데이터셋은 두 개의 32 Channel Lidar를 이용하여 하나의 64 Channel Lidar처럼 사용하였다. Up Lidar와 Down Lidar에 대한 Sensor Calibration을 제공하지만 Point Cloud는 이미 두 Lidar를 융합하여 Ego Vehicle의 좌표계로 변환해 둔 데이터를 제공하기에 쓸 일이 없다.
+
+
+### 카메라 캘리브레이션
 
 
 ## 동일한 도로 노면 표시 감지
+
+
+# Feature Detection And Matching
+
+### 1. Bird's Eyes View
+카메라 이미지를 Point Cloud 데이터에 Projection 하였을 때 오차가 발생한다. 따라서 조금 더 정확한 이미지로 Feature Detection을 하기 위해 Point Cloud 데이터를 Bird's Eyes View 이미지로 만들도록 하였다. Point Cloud는 Sparse한 특성을 가지고 있기 때문에 이미지 형태로 변환할 때 비어있는 Pixel에 대해 주변 값들의 평균을 내어 값을 채워주었다. 
+![](./assets/0002_bev_blank.gif "빈 Pixel 채우기 BF/AF")
+
+사실 도로 위에 촬영 당시 지나가던 자동차와 행인등 여러가지 Noise가 존재하기 때문에 Worm's Eyes View로 제작하려 하였지만 동일 Pixel값을 가지는 Points중 가장 작은 z좌표를 가지는 포인트를 채택하는 방법은 큰 연산량을 요구하여서 조금 더 최적화가 필요할 것 같다.
+
+또한 x, y 좌표가 Pixel로(integer) Quantization되기 때문에 어느정도 오차를 감수해야 한다. 이를 보완하는 방법 역시 생각해야 할 것 같다.
+
+### 2. Feature Detection
+FAST(Features from Accelerated Segment Test) 알고리즘과 BIREF(BInary Robust Independent Elementary Features) 알고리즘을 합친 ORB(Oriented FAST and Rotated BIREF) 알고리즘을 이용하여 Feature Detection을 수행한다.
+![](./assets/0003_feature_detection.jpg "BEV Feature Detection")
+
+Edge가 아닌 부분도 Feature로 검출된 것을 볼 수 있다. Point Cloud의 Sparse한 특성으로 도로 노면에 존재하는 모든 
+
+### 3. Feature Matching
+서로 다른 시간에 동일한 공간을 촬영한 측위 오차가 존재하는 Point Cloud의 BEV 이미지에 ORB를 이용해 추출한 Feature들을 서로 Matching하였다. 
+![](./assets/0004_feature_matching.jpg "BEV Feature Matching")
+![](./assets/0005_feature_matching_valid.jpg "Valid Matchings")
+
+Top 10의 Matching중 유효한 Matching은 2개 뿐이었다. 아마 위에서 언급한 이유로 잘못된 Feature들이 검출되기 때문인 것 같다.
 
 
 ## Citation
